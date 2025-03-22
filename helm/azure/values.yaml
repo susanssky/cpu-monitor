@@ -1,0 +1,37 @@
+projectName: cpu-monitor
+namespace: default
+
+cloudProvider:
+  name: "azure"
+  aws:
+    enabled: false
+  azure:
+    enabled: true
+
+deployment:
+  node:
+    clusterName: ""
+    databaseUrl: ""
+    subscriptionId: ""
+    resourceGroupName: ""
+    tenantId: ""
+    clientId: ""
+    clientSecret: ""
+  client:
+    viteExternalUrl: ""
+
+serviceAccount:
+  name: ""
+  clientId: ""
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: "" # 可選，留空表示不使用記憶體指標
+
+currentPort: 4003
+healthPort: 4000
+stressPort: 4001
+nodePort: 4002
+clientPort: 3000

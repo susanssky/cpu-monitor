@@ -1,0 +1,49 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.projectName }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /health/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.projectName }}-health-srv
+                port:
+                  number: {{ .Values.healthPort }}
+          - path: /current/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.projectName }}-current-srv
+                port:
+                  number: {{ .Values.currentPort }} 
+          - path: /stress/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.projectName }}-stress-srv
+                port:
+                  number: {{ .Values.stressPort }}
+          - path: /node/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.projectName }}-node-{{ .Values.cloudProvider.name }}-srv
+                port:
+                  number: {{ .Values.nodePort }}
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.projectName }}-client-{{ .Values.cloudProvider.name }}-srv
+                port:
+                  number: {{ .Values.clientPort }} 

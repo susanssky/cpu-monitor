@@ -1,0 +1,40 @@
+{{- if .Values.cloudProvider.azure.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.projectName }}-client-azure-srv
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.projectName }}-client-azure-depl
+  ports:
+    - port: {{ .Values.clientPort }}
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}-client-azure-depl
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.projectName }}-client-azure-depl
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.projectName }}-client-azure-depl
+    spec:
+      # serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        - name: {{ .Values.projectName }}-client-azure-depl
+          image: susanssky/cpu-monitor-client-azure:latest
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+          env:
+          - name: VITE_EXTERNAL_URL
+            value: {{ .Values.deployment.client.viteExternalUrl }}
+{{- end }}

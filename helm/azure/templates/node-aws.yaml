@@ -1,0 +1,76 @@
+{{- if .Values.cloudProvider.aws.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.projectName }}-node-aws-srv
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.projectName }}-node-aws-depl
+  ports:
+    - port: {{ .Values.nodePort }}
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}-node-aws-depl
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.projectName }}-node-aws-depl
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.projectName }}-node-aws-depl
+    spec:
+      # serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        - name: {{ .Values.projectName }}-node-aws-depl
+          image: susanssky/cpu-monitor-node-aws:latest
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+          env:
+          - name: PORT
+            value: {{ .Values.nodePort | quote }}
+          - name: CLUSTER_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: cluster_name
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: database_url
+          - name: SUBSCRIPTION_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: subscription_id
+          - name: RESOURCE_GROUP_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: rescource_group_name
+          - name: TENANT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: tenant_id
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: client_id
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.projectName }}-secret-env
+                key: client_secret
+{{- end }}

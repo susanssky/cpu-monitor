@@ -1,0 +1,78 @@
+name: CPU Monitor (AKS)
+# on: push
+permissions: # because use role-to-assume to login
+  id-token: write
+  contents: read
+on:
+  project:
+    types: deleted
+jobs:
+  azure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            client:
+              - 'app/client-azure/**'
+            node:
+              - 'app/node-azure/**'
+            health:
+              - 'app/health/**'
+            stress:
+              - 'app/stress/**'
+            current:
+              - 'app/current/**'
+      - uses: docker/login-action@v3
+        if: steps.filter.outputs.client == 'true'  || steps.filter.outputs.node == 'true'|| steps.filter.outputs.health == 'true'|| steps.filter.outputs.stress == 'true'|| steps.filter.outputs.current == 'true'
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: push client image to hub if there are any updadte in client-azure folder
+        if: steps.filter.outputs.client == 'true'
+        run: |
+          docker build -f ./app/client-azure/Dockerfile -t susanssky/cpu-monitor-client-azure:latest .
+          docker push susanssky/cpu-monitor-client-azure:latest
+
+      - name: push node image to hub if there are any updadte in node-azure folder
+        if: steps.filter.outputs.node == 'true'
+        run: |
+          docker build -f ./app/node-azure/Dockerfile -t susanssky/cpu-monitor-node-azure:latest .
+          docker push susanssky/cpu-monitor-node-azure:latest
+
+      - name: push stress image to hub if there are any updadte in stress folder
+        if: steps.filter.outputs.stress == 'true'
+        run: |
+          docker build -f ./app/stress/Dockerfile -t susanssky/cpu-monitor-stress:latest .
+          docker push susanssky/cpu-monitor-stress:latest
+
+      - name: push current image to hub if there are any updadte in current folder
+        if: steps.filter.outputs.current == 'true'
+        run: |
+          docker build -f ./app/current/Dockerfile -t susanssky/cpu-monitor-current:latest .
+          docker push susanssky/cpu-monitor-current:latest
+
+      - name: push health image to hub if there are any updadte in health folder
+        if: steps.filter.outputs.health == 'true'
+        run: |
+          docker build -f ./app/health/Dockerfile -t susanssky/cpu-monitor-health:latest .
+          docker push susanssky/cpu-monitor-health:latest
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false # for get the terraform output value
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform command
+        working-directory: ./terraform/azure
+        run: |
+          terraform init
+          terraform fmt -check
+          terraform apply -auto-approve -var "database_username=${{ secrets.DB_USER }}" -var "database_password=${{ secrets.DB_PW }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
