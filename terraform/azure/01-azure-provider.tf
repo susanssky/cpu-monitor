@@ -9,8 +9,8 @@ terraform {
   backend "azurerm" {
     resource_group_name  = "forGithubActions"
     storage_account_name = "cloudprojectstfstate"
-    container_name       = "tfstate"
-    key                  = "cpu-monitor.tfstate"
+    container_name       = "my-cloud-projects-tfstate"
+    key                  = "4-cpu-monitor.tfstate"
   }
 }
 

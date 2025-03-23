@@ -10,25 +10,30 @@ cloudProvider:
 
 deployment:
   node:
-    clusterName: ""
+    # both
     databaseUrl: ""
+    clusterName: ""
+
+    # aks
     subscriptionId: ""
     resourceGroupName: ""
     tenantId: ""
     clientId: ""
     clientSecret: ""
+
+    # # eks
+    # vpcId: ""
+    # nodeGroupName: ""
+
   client:
     viteExternalUrl: ""
 
-serviceAccount:
-  name: ""
-  clientId: ""
 hpa:
   enabled: true
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: "" # 可選，留空表示不使用記憶體指標
+  targetMemoryUtilizationPercentage: ""
 
 currentPort: 4003
 healthPort: 4000

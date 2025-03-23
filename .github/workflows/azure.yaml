@@ -1,11 +1,11 @@
 name: CPU Monitor (AKS)
-# on: push
+on: push
 permissions: # because use role-to-assume to login
   id-token: write
   contents: read
-on:
-  project:
-    types: deleted
+# on:
+#   project:
+#     types: deleted
 jobs:
   azure:
     runs-on: ubuntu-latest

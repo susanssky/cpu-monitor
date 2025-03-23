@@ -26,7 +26,6 @@ spec:
       labels:
         app: {{ .Values.projectName }}-node-azure-depl
     spec:
-      # serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: {{ .Values.projectName }}-node-azure-depl
           image: susanssky/cpu-monitor-node-azure:latest

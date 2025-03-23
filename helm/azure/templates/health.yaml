@@ -26,7 +26,6 @@ spec:
       labels:
         app: {{ .Values.projectName }}-health-depl
     spec:
-      # serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: {{ .Values.projectName }}-health-depl
           image: susanssky/cpu-monitor-health:latest

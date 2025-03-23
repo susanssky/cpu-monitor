@@ -26,7 +26,6 @@ spec:
       labels:
         app: {{ .Values.projectName }}-current-depl
     spec:
-      # serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: {{ .Values.projectName }}-current-depl
           image: susanssky/cpu-monitor-current:latest

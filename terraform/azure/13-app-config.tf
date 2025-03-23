@@ -114,19 +114,6 @@ resource "helm_release" "my_app" {
     value = "http://${local.external_url}"
   }
 
-
-  # sa
-  # set {
-  #   name  = "serviceAccount.name"
-  #   value = azurerm_user_assigned_identity.aks_identity.name
-  #   # value = "${local.project_name}-sa"
-  # }
-
-  # set {
-  #   name  = "serviceAccount.clientId"
-  #   value = azurerm_user_assigned_identity.aks_identity.client_id
-  # }
-
   # HPA
   set {
     name  = "hpa.enabled"
