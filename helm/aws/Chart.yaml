@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cpu-monitor
+description: A Helm chart for cpu-monitor application
+version: 0.1.0

@@ -1,0 +1,40 @@
+{{- if .Values.cloudProvider.aws.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.projectName }}-client-aws-srv
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.projectName }}-client-aws-depl
+  ports:
+    - port: {{ .Values.clientPort }}
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}-client-aws-depl
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.projectName }}-client-aws-depl
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.projectName }}-client-aws-depl
+    spec:
+      containers:
+        - name: {{ .Values.projectName }}-client-aws-depl
+          image: susanssky/cpu-monitor-client-aws:latest
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+          envFrom:
+          - configMapRef:
+              name: {{ .Values.projectName }}-config
+{{- end }}          

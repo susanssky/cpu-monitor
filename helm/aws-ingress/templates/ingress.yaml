@@ -1,0 +1,52 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.projectName }}-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+
+
+
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.projectName }}-health-srv
+                port:
+                  number: {{ .Values.healthPort }}
+          - path: /current
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.projectName }}-current-srv
+                port:
+                  number: {{ .Values.currentPort }} 
+          - path: /stress
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.projectName }}-stress-srv
+                port:
+                  number: {{ .Values.stressPort }}
+          - path: /node
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.projectName }}-node-{{ .Values.cloudProvider.name }}-srv
+                port:
+                  number: {{ .Values.nodePort }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.projectName }}-client-{{ .Values.cloudProvider.name }}-srv
+                port:
+                  number: {{ .Values.clientPort }} 

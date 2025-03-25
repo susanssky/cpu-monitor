@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cpu-monitor-ingress
+description: A Helm chart for cpu-monitor ingress
+version: 0.1.0

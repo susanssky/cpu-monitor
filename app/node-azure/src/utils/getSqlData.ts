@@ -15,6 +15,10 @@ export const refreshNodes = async () => {
       cpu: cpuUsage,
     }))
 
+    if (instances.length === 0) {
+      return []
+    }
+
     const results = await db
       .insert(dbTable)
       .values(instances)

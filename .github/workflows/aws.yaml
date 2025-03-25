@@ -1,13 +1,13 @@
-name: CPU Monitor (AKS)
-# on: push
+name: CPU Monitor (EKS)
+on: push
 permissions: # because use role-to-assume to login
   id-token: write
   contents: read
-on:
-  project:
-    types: deleted
+  # on:
+  # project:
+  #   types: deleted
 jobs:
-  azure:
+  aws:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,9 +16,9 @@ jobs:
         with:
           filters: |
             client:
-              - 'app/client-azure/**'
+              - 'app/client-aws/**'
             node:
-              - 'app/node-azure/**'
+              - 'app/node-aws/**'
             health:
               - 'app/health/**'
             stress:
@@ -31,19 +31,19 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: push client image to hub if there are any updadte in client-azure folder
-        working-directory: ./app/client-azure
+      - name: push client image to hub if there are any updadte in client-aws folder
+        working-directory: ./app/client-aws
         if: steps.filter.outputs.client == 'true'
         run: |
-          docker build -t susanssky/cpu-monitor-client-azure:latest .
-          docker push susanssky/cpu-monitor-client-azure:latest
+          docker build -t susanssky/cpu-monitor-client-aws:latest .
+          docker push susanssky/cpu-monitor-client-aws:latest
 
-      - name: push node image to hub if there are any updadte in node-azure folder
-        working-directory: ./app/node-azure
+      - name: push node image to hub if there are any updadte in node-aws folder
+        working-directory: ./app/node-aws
         if: steps.filter.outputs.node == 'true'
         run: |
-          docker build -t susanssky/cpu-monitor-node-azure:latest .
-          docker push susanssky/cpu-monitor-node-azure:latest
+          docker build -t susanssky/cpu-monitor-node-aws:latest .
+          docker push susanssky/cpu-monitor-node-aws:latest
 
       - name: push stress image to hub if there are any updadte in stress folder
         working-directory: ./app/stress
@@ -69,15 +69,16 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false # for get the terraform output value
-      - uses: azure/login@v2
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-2
+      # - name: Generate kubeconfig
+      #   run: |
+      #     aws eks update-kubeconfig --name cpu-monitor-eks
       - name: Terraform command
-        working-directory: ./terraform/azure
+        working-directory: ./terraform/aws
         run: |
           terraform init
           terraform fmt -check
-          terraform apply -auto-approve -var "database_username=${{ secrets.DB_USER }}" -var "database_password=${{ secrets.DB_PW }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+          terraform apply -auto-approve -var "database_username=${{ secrets.DB_USER }}" -var "database_password=${{ secrets.DB_PW }}" -var "your_role_or_user=${{ secrets.AWS_IAM_USER }}" -var "github_actions_role=${{ secrets.AWS_ROLE_TO_ASSUME }}"

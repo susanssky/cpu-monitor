@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.projectName }}-config
+  namespace: {{ .Values.namespace }}
+data:
+  VITE_EXTERNAL_URL: {{ .Values.deployment.client.viteExternalUrl }}

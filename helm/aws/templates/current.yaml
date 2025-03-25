@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.projectName }}-current-srv
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.projectName }}-current-depl
+  ports:
+    - port: {{ .Values.currentPort }}
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}-current-depl
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.projectName }}-current-depl
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.projectName }}-current-depl
+    spec:
+
+      containers:
+        - name: {{ .Values.projectName }}-current-depl
+          image: susanssky/cpu-monitor-current:latest
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+          env:
+          - name: PORT
+            value: {{ .Values.currentPort | quote }}
+          

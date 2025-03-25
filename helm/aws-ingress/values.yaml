@@ -1,0 +1,15 @@
+projectName: cpu-monitor
+namespace: default
+
+cloudProvider:
+  name: "aws"
+  aws:
+    enabled: true
+  azure:
+    enabled: false
+
+currentPort: 4003
+healthPort: 4000
+stressPort: 4001
+nodePort: 4002
+clientPort: 3000
